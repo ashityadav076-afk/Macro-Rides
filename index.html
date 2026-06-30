@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Macro Rides — Zone &amp; Corridor Visualization</title>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- H3 (geospatial indexing) -->
+<script src="https://unpkg.com/h3-js@4.1.0/dist/h3-js.umd.js"></script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <header class="app__header">
+    <div class="brand">
+      <span class="brand__mark">⬡</span>
+      <div class="brand__text">
+        <span class="brand__name">MACRO RIDES</span>
+        <span class="brand__tag">Zone &amp; Corridor Visualization — H3 Spatial Engine</span>
+      </div>
+    </div>
+    <div class="header__status" id="statusPill">
+      <span class="dot dot--idle" id="statusDot"></span>
+      <span id="statusText">Idle</span>
+    </div>
+  </header>
+
+  <main class="app__body">
+
+    <aside class="panel">
+
+      <section class="panel__section">
+        <h2 class="panel__title">Simulated Drive</h2>
+        <p class="panel__hint">Replays a hardcoded driver route through Delhi NCR. The 350m H3 corridor grows live as the driver advances, re-evaluating pickup eligibility in real time.</p>
+        <div class="controls-row">
+          <button id="playBtn" class="btn btn--primary">▶ Play</button>
+          <button id="resetBtn" class="btn">↺ Reset</button>
+        </div>
+        <label class="field">
+          <span class="field__label">Speed</span>
+          <input type="range" id="speedSlider" min="1" max="5" step="1" value="3" />
+        </label>
+        <label class="field">
+          <span class="field__label">Progress</span>
+          <input type="range" id="progressSlider" min="0" max="100" step="1" value="0" />
+        </label>
+      </section>
+
+      <section class="panel__section">
+        <h2 class="panel__title">Corridor Settings</h2>
+        <label class="field">
+          <span class="field__label">Buffer radius</span>
+          <span class="field__value" id="bufferValue">350 m</span>
+        </label>
+        <label class="field">
+          <span class="field__label">H3 resolution</span>
+          <select id="resolutionSelect" class="select">
+            <option value="8">8 (≈531 m edge — coarse / fast)</option>
+            <option value="9" selected>9 (≈201 m edge — recommended)</option>
+            <option value="10">10 (≈76 m edge — fine / precise)</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="panel__section">
+        <h2 class="panel__title">Layers</h2>
+        <label class="check"><input type="checkbox" id="toggleZones" checked /> Service zone boundaries</label>
+        <label class="check"><input type="checkbox" id="toggleCorridor" checked /> 350m route corridor</label>
+        <label class="check"><input type="checkbox" id="togglePickups" checked /> Pickup points</label>
+        <label class="check"><input type="checkbox" id="toggleHexGrid" /> H3 cell grid (debug)</label>
+      </section>
+
+      <section class="panel__section">
+        <h2 class="panel__title">Live Stats</h2>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat__value mono" id="statCorridorCells">0</span>
+            <span class="stat__label">corridor cells</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value mono" id="statEligible">0</span>
+            <span class="stat__label">eligible pickups</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value mono" id="statTotal">0</span>
+            <span class="stat__label">total pickups</span>
+          </div>
+          <div class="stat">
+            <span class="stat__value mono" id="statK">0</span>
+            <span class="stat__label">grid-disk k</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel__section panel__section--last">
+        <h2 class="panel__title">Add a pickup point</h2>
+        <p class="panel__hint">Click anywhere on the map to drop a pickup point and instantly query its eligibility against the current corridor (O(1) H3 set lookup).</p>
+      </section>
+
+    </aside>
+
+    <div class="map-wrap">
+      <div id="map"></div>
+      <div class="legend">
+        <div class="legend__item"><span class="legend__swatch legend__swatch--corridor"></span>350m corridor</div>
+        <div class="legend__item"><span class="legend__swatch legend__swatch--route"></span>Driver route</div>
+        <div class="legend__item"><span class="legend__swatch legend__swatch--eligible"></span>Eligible pickup</div>
+        <div class="legend__item"><span class="legend__swatch legend__swatch--ineligible"></span>Ineligible pickup</div>
+        <div class="legend__item"><span class="legend__swatch legend__swatch--zoneA"></span>Central Delhi zone</div>
+        <div class="legend__item"><span class="legend__swatch legend__swatch--zoneB"></span>South Delhi zone</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/geo.js"></script>
+<script src="js/corridor.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
